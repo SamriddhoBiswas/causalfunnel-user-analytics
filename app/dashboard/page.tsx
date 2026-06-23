@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type View = "sessions" | "heatmap";
 
 type Session = {
   sessionId: string;
   eventCount: number;
+  latestTimestamp?: string;
 };
 
 type AnalyticsEvent = {
@@ -79,6 +80,12 @@ export default function DashboardPage() {
   const [sessionsError, setSessionsError] = useState("");
   const [eventsError, setEventsError] = useState("");
   const [heatmapError, setHeatmapError] = useState("");
+  const [sessionTimestamps, setSessionTimestamps] = useState<Map<string, string>>(new Map());
+  const [heatmapDimensions, setHeatmapDimensions] = useState({
+    width: PREVIEW_WIDTH,
+    height: PREVIEW_HEIGHT
+  });
+  const heatmapContainerRef = useRef<HTMLDivElement>(null);
 
   const loadSessions = useCallback(async () => {
     setSessionsLoading(true);
@@ -98,6 +105,16 @@ export default function DashboardPage() {
 
       const nextSessions = data.sessions ?? [];
       setSessions(nextSessions);
+      
+      // Populate sessionTimestamps from API response immediately
+      const timestamps = new Map<string, string>();
+      nextSessions.forEach((session) => {
+        if (session.latestTimestamp) {
+          timestamps.set(session.sessionId, session.latestTimestamp);
+        }
+      });
+      setSessionTimestamps(timestamps);
+      
       setSelectedSessionId((current) => {
         if (current && nextSessions.some((session) => session.sessionId === current)) {
           return current;
@@ -114,6 +131,34 @@ export default function DashboardPage() {
   useEffect(() => {
     void loadSessions();
   }, [loadSessions]);
+
+  useEffect(() => {
+    if (view !== "heatmap") return;
+
+    const container = heatmapContainerRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver(() => {
+      if (heatmapContainerRef.current) {
+        const width = heatmapContainerRef.current.offsetWidth;
+        const height = heatmapContainerRef.current.offsetHeight;
+        setHeatmapDimensions({ width, height });
+      }
+    });
+
+    observer.observe(container);
+
+    // Trigger initial measurement
+    setTimeout(() => {
+      if (heatmapContainerRef.current) {
+        const width = heatmapContainerRef.current.offsetWidth;
+        const height = heatmapContainerRef.current.offsetHeight;
+        setHeatmapDimensions({ width, height });
+      }
+    }, 0);
+
+    return () => observer.disconnect();
+  }, [view]);
 
   useEffect(() => {
     if (!selectedSessionId) {
@@ -144,6 +189,12 @@ export default function DashboardPage() {
 
         const nextEvents = data.events ?? [];
         setEvents(nextEvents);
+
+        // Capture latest event timestamp for this session
+        if (nextEvents.length > 0) {
+          const latestTimestamp = nextEvents[nextEvents.length - 1].timestamp;
+          setSessionTimestamps(prev => new Map(prev).set(selectedSessionId, latestTimestamp));
+        }
 
         const discoveredUrls = Array.from(new Set(nextEvents.map((event) => event.pageUrl)));
         setPageUrls((current) => Array.from(new Set([...current, ...discoveredUrls])).sort());
@@ -215,8 +266,8 @@ export default function DashboardPage() {
       PREVIEW_HEIGHT,
       ...validClicks.map((click) => Math.max(0, click.y))
     );
-    const drawableWidth = PREVIEW_WIDTH - PREVIEW_PADDING * 2;
-    const drawableHeight = PREVIEW_HEIGHT - PREVIEW_PADDING * 2;
+    const drawableWidth = heatmapDimensions.width - PREVIEW_PADDING * 2;
+    const drawableHeight = heatmapDimensions.height - PREVIEW_PADDING * 2;
 
     return {
       sourceWidth,
@@ -231,7 +282,21 @@ export default function DashboardPage() {
           (Math.min(Math.max(click.y, 0), sourceHeight) / sourceHeight) * drawableHeight
       }))
     };
-  }, [clicks]);
+  }, [clicks, heatmapDimensions]);
+
+  const sortedSessions = useMemo(() => {
+    return [...sessions].sort((a, b) => {
+      const timeA = sessionTimestamps.get(a.sessionId);
+      const timeB = sessionTimestamps.get(b.sessionId);
+
+      // Sessions with timestamps come first, sorted by most recent
+      if (!timeA && !timeB) return 0;
+      if (!timeA) return 1;
+      if (!timeB) return -1;
+
+      return new Date(timeB).getTime() - new Date(timeA).getTime();
+    });
+  }, [sessions, sessionTimestamps]);
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -304,7 +369,7 @@ export default function DashboardPage() {
                 <div className="p-4"><EmptyState title="No sessions yet" description="Visit and click around the demo page to create your first session." /></div>
               ) : (
                 <div className="max-h-[620px] space-y-1 overflow-y-auto p-2">
-                  {sessions.map((session) => (
+                  {sortedSessions.map((session) => (
                     <button
                       key={session.sessionId}
                       type="button"
@@ -411,8 +476,9 @@ export default function DashboardPage() {
                   </div>
                   <div className="overflow-auto rounded-2xl border border-slate-300 bg-slate-100 p-3">
                     <div
+                      ref={heatmapContainerRef}
                       className="relative overflow-hidden rounded-xl bg-white shadow-inner"
-                      style={{ width: PREVIEW_WIDTH, height: PREVIEW_HEIGHT }}
+                      style={{ width: '100%', aspectRatio: `${PREVIEW_WIDTH} / ${PREVIEW_HEIGHT}` }}
                       aria-label={`Heatmap showing ${normalizedHeatmap.points.length} normalized clicks`}
                     >
                       <div className="absolute inset-x-0 top-0 h-16 border-b border-slate-200 bg-slate-50" />

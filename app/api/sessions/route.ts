@@ -10,19 +10,21 @@ export async function GET() {
       {
         $group: {
           _id: "$sessionId",
-          eventCount: { $sum: 1 }
+          eventCount: { $sum: 1 },
+          latestTimestamp: { $max: "$timestamp" }
         }
       },
       {
         $project: {
           _id: 0,
           sessionId: "$_id",
-          eventCount: 1
+          eventCount: 1,
+          latestTimestamp: 1
         }
       },
       {
         $sort: {
-          eventCount: -1,
+          latestTimestamp: -1,
           sessionId: 1
         }
       }

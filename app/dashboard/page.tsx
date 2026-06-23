@@ -29,6 +29,7 @@ type HeatmapClick = {
 
 const PREVIEW_WIDTH = 900;
 const PREVIEW_HEIGHT = 520;
+const PREVIEW_PADDING = 16;
 
 function formatTimestamp(value: string) {
   return new Intl.DateTimeFormat("en", {
@@ -202,9 +203,35 @@ export default function DashboardPage() {
     [sessions]
   );
 
-  const visibleClicks = clicks.filter(
-    (click) => click.x >= 0 && click.x <= PREVIEW_WIDTH && click.y >= 0 && click.y <= PREVIEW_HEIGHT
-  );
+  const normalizedHeatmap = useMemo(() => {
+    const validClicks = clicks.filter(
+      (click) => Number.isFinite(click.x) && Number.isFinite(click.y)
+    );
+    const sourceWidth = Math.max(
+      PREVIEW_WIDTH,
+      ...validClicks.map((click) => Math.max(0, click.x))
+    );
+    const sourceHeight = Math.max(
+      PREVIEW_HEIGHT,
+      ...validClicks.map((click) => Math.max(0, click.y))
+    );
+    const drawableWidth = PREVIEW_WIDTH - PREVIEW_PADDING * 2;
+    const drawableHeight = PREVIEW_HEIGHT - PREVIEW_PADDING * 2;
+
+    return {
+      sourceWidth,
+      sourceHeight,
+      points: validClicks.map((click) => ({
+        ...click,
+        normalizedX:
+          PREVIEW_PADDING +
+          (Math.min(Math.max(click.x, 0), sourceWidth) / sourceWidth) * drawableWidth,
+        normalizedY:
+          PREVIEW_PADDING +
+          (Math.min(Math.max(click.y, 0), sourceHeight) / sourceHeight) * drawableHeight
+      }))
+    };
+  }, [clicks]);
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -378,13 +405,15 @@ export default function DashboardPage() {
                 <>
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs font-medium text-slate-500">
                     <span>{clicks.length} click{clicks.length === 1 ? "" : "s"} recorded</span>
-                    <span>{clicks.length - visibleClicks.length} outside preview bounds</span>
+                    <span>
+                      Normalized from {Math.ceil(normalizedHeatmap.sourceWidth)} × {Math.ceil(normalizedHeatmap.sourceHeight)}
+                    </span>
                   </div>
                   <div className="overflow-auto rounded-2xl border border-slate-300 bg-slate-100 p-3">
                     <div
                       className="relative overflow-hidden rounded-xl bg-white shadow-inner"
                       style={{ width: PREVIEW_WIDTH, height: PREVIEW_HEIGHT }}
-                      aria-label={`Heatmap showing ${visibleClicks.length} visible clicks`}
+                      aria-label={`Heatmap showing ${normalizedHeatmap.points.length} normalized clicks`}
                     >
                       <div className="absolute inset-x-0 top-0 h-16 border-b border-slate-200 bg-slate-50" />
                       <div className="absolute left-6 top-5 h-6 w-24 rounded-md bg-slate-200" />
@@ -400,12 +429,12 @@ export default function DashboardPage() {
                         <span className="h-44 rounded-xl border border-slate-200 bg-slate-50" />
                       </div>
 
-                      {visibleClicks.map((click, index) => (
+                      {normalizedHeatmap.points.map((click, index) => (
                         <span
                           key={`${click.sessionId}-${click.timestamp}-${index}`}
                           className="absolute z-10 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-rose-500/80 shadow-[0_0_0_6px_rgba(244,63,94,0.18)]"
-                          style={{ left: click.x, top: click.y }}
-                          title={`Click at (${click.x}, ${click.y})`}
+                          style={{ left: click.normalizedX, top: click.normalizedY }}
+                          title={`Original click at (${click.x}, ${click.y})`}
                         />
                       ))}
                     </div>

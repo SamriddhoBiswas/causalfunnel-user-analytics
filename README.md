@@ -146,7 +146,8 @@ http://localhost:3000/dashboard
 * Authentication and access control
 
 ---
-
+![Dashboard Session](./screenshots/session.jpeg)
+![Dashboard Heatmap](./screenshots/heatmap.png)
 ---
 
 ## License

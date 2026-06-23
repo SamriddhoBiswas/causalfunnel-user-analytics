@@ -34,8 +34,10 @@ const PREVIEW_PADDING = 16;
 
 function formatTimestamp(value: string) {
   return new Intl.DateTimeFormat("en", {
-    dateStyle: "medium",
-    timeStyle: "medium"
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
   }).format(new Date(value));
 }
 
@@ -47,7 +49,7 @@ function shortSessionId(sessionId: string) {
 
 function LoadingBlock({ label }: { label: string }) {
   return (
-    <div className="flex min-h-56 items-center justify-center rounded-2xl border border-slate-200 bg-white">
+    <div className="flex min-h-56 items-center justify-center rounded-2xl border border-slate-200/80 bg-white/90 shadow-[0_12px_30px_-20px_rgba(15,23,42,0.45)]">
       <div className="flex items-center gap-3 text-sm font-medium text-slate-500">
         <span className="h-5 w-5 animate-spin rounded-full border-2 border-violet-200 border-t-violet-600" />
         {label}
@@ -58,8 +60,8 @@ function LoadingBlock({ label }: { label: string }) {
 
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <div className="flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center">
-      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-slate-100 text-xl">◇</span>
+    <div className="flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 px-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-xl shadow-sm">◌</span>
       <h3 className="mt-4 font-semibold text-slate-900">{title}</h3>
       <p className="mt-1 max-w-md text-sm leading-6 text-slate-500">{description}</p>
     </div>
@@ -105,8 +107,7 @@ export default function DashboardPage() {
 
       const nextSessions = data.sessions ?? [];
       setSessions(nextSessions);
-      
-      // Populate sessionTimestamps from API response immediately
+
       const timestamps = new Map<string, string>();
       nextSessions.forEach((session) => {
         if (session.latestTimestamp) {
@@ -114,7 +115,7 @@ export default function DashboardPage() {
         }
       });
       setSessionTimestamps(timestamps);
-      
+
       setSelectedSessionId((current) => {
         if (current && nextSessions.some((session) => session.sessionId === current)) {
           return current;
@@ -148,7 +149,6 @@ export default function DashboardPage() {
 
     observer.observe(container);
 
-    // Trigger initial measurement
     setTimeout(() => {
       if (heatmapContainerRef.current) {
         const width = heatmapContainerRef.current.offsetWidth;
@@ -190,10 +190,9 @@ export default function DashboardPage() {
         const nextEvents = data.events ?? [];
         setEvents(nextEvents);
 
-        // Capture latest event timestamp for this session
         if (nextEvents.length > 0) {
           const latestTimestamp = nextEvents[nextEvents.length - 1].timestamp;
-          setSessionTimestamps(prev => new Map(prev).set(selectedSessionId, latestTimestamp));
+          setSessionTimestamps((prev) => new Map(prev).set(selectedSessionId, latestTimestamp));
         }
 
         const discoveredUrls = Array.from(new Set(nextEvents.map((event) => event.pageUrl)));
@@ -289,7 +288,6 @@ export default function DashboardPage() {
       const timeA = sessionTimestamps.get(a.sessionId);
       const timeB = sessionTimestamps.get(b.sessionId);
 
-      // Sessions with timestamps come first, sorted by most recent
       if (!timeA && !timeB) return 0;
       if (!timeA) return 1;
       if (!timeB) return -1;
@@ -299,48 +297,88 @@ export default function DashboardPage() {
   }, [sessions, sessionTimestamps]);
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-slate-950 text-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-6 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-          <div className="flex items-center gap-4">
-            <a href="/" className="grid h-11 w-11 place-items-center rounded-2xl bg-violet-500 font-black shadow-lg shadow-violet-950/30">
-              CF
-            </a>
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(124,58,237,0.14),_transparent_28%),linear-gradient(180deg,_#f8fafc_0%,_#f1f5f9_100%)]">
+      <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-violet-700">
+              <span className="h-2 w-2 rounded-full bg-violet-500" />
+              Live
+            </div>
             <div>
-              <p className="text-lg font-bold tracking-tight">Analytics dashboard</p>
-              <p className="text-sm text-slate-400">Live interaction intelligence</p>
+              <h1 className="text-xl font-semibold tracking-tight text-slate-950 sm:text-xl">
+                User Analytics Dashboard
+              </h1>
+              
             </div>
           </div>
-          <a href="/" className="w-fit rounded-xl border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-violet-400 hover:text-white">
+          <a
+            href="/"
+            className="inline-flex w-fit items-center justify-center rounded-xl border border-slate-200 bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_30px_-15px_rgba(15,23,42,0.8)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+          >
             View demo page
           </a>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
-        <section className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-slate-500">Total sessions</p>
-            <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">{sessionsLoading ? "—" : sessions.length}</p>
+      <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
+        <section className="grid gap-4 lg:grid-cols-3">
+          <div className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.35)] transition hover:-translate-y-1 hover:shadow-[0_22px_55px_-24px_rgba(15,23,42,0.45)]">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-500">Total sessions</p>
+                <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">{sessionsLoading ? "—" : sessions.length}</p>
+              </div>
+              <div className="rounded-2xl border border-violet-100 bg-violet-50 p-2.5 text-violet-600">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v11A2.5 2.5 0 0 1 16.5 20h-9A2.5 2.5 0 0 1 5 17.5z" />
+                  <path d="M8 8h8" />
+                  <path d="M8 12h5" />
+                </svg>
+              </div>
+            </div>
+            <p className="mt-3 text-sm text-slate-500">Tracked visitor journeys from the current dataset.</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-slate-500">Events captured</p>
-            <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">{sessionsLoading ? "—" : totalEvents}</p>
+          <div className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.35)] transition hover:-translate-y-1 hover:shadow-[0_22px_55px_-24px_rgba(15,23,42,0.45)]">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-500">Events captured</p>
+                <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">{sessionsLoading ? "—" : totalEvents}</p>
+              </div>
+              <div className="rounded-2xl border border-sky-100 bg-sky-50 p-2.5 text-sky-600">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M5 7h14" />
+                  <path d="M8 12h8" />
+                  <path d="M10 17h4" />
+                </svg>
+              </div>
+            </div>
+            <p className="mt-3 text-sm text-slate-500">Page views and clicks recorded across sessions.</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-slate-500">Known pages</p>
-            <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">{pageUrls.length}</p>
+          <div className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.35)] transition hover:-translate-y-1 hover:shadow-[0_22px_55px_-24px_rgba(15,23,42,0.45)]">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-500">Known pages</p>
+                <p className="mt-3 text-3xl font-black tracking-tight text-slate-950">{pageUrls.length}</p>
+              </div>
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-2.5 text-emerald-600">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M5 7.5A2.5 2.5 0 0 1 7.5 5h4.1l2.4 2.4H16.5A2.5 2.5 0 0 1 19 9.9v6.6A2.5 2.5 0 0 1 16.5 19h-9A2.5 2.5 0 0 1 5 16.5z" />
+                </svg>
+              </div>
+            </div>
+            <p className="mt-3 text-sm text-slate-500">Tracked URLs surfaced from the selected journeys.</p>
           </div>
         </section>
 
-        <nav className="mt-8 inline-flex rounded-xl bg-slate-200/70 p-1" aria-label="Dashboard views">
+        <nav className="mt-6 inline-flex rounded-2xl border border-slate-200 bg-white/80 p-1 shadow-sm" aria-label="Dashboard views">
           {(["sessions", "heatmap"] as View[]).map((item) => (
             <button
               key={item}
               type="button"
               onClick={() => setView(item)}
-              className={`rounded-lg px-5 py-2.5 text-sm font-semibold capitalize transition ${
-                view === item ? "bg-white text-violet-700 shadow-sm" : "text-slate-600 hover:text-slate-950"
+              className={`rounded-xl px-4 py-2 text-sm font-semibold capitalize transition focus:outline-none focus:ring-2 focus:ring-violet-500/40 ${
+                view === item ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
               }`}
             >
               {item}
@@ -349,14 +387,18 @@ export default function DashboardPage() {
         </nav>
 
         {view === "sessions" ? (
-          <section className="mt-6 grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
-            <aside className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <section className="mt-6 grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+            <aside className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_18px_45px_-24px_rgba(15,23,42,0.45)]">
               <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                 <div>
-                  <h2 className="font-bold text-slate-950">Sessions</h2>
-                  <p className="text-xs text-slate-500">Select a visitor journey</p>
+                  <h2 className="text-base font-semibold text-slate-950">Sessions</h2>
+                  <p className="text-xs text-slate-500">Recent visitor journeys</p>
                 </div>
-                <button type="button" onClick={() => void loadSessions()} className="rounded-lg px-3 py-2 text-xs font-bold text-violet-700 hover:bg-violet-50">
+                <button
+                  type="button"
+                  onClick={() => void loadSessions()}
+                  className="rounded-lg px-3 py-2 text-xs font-semibold text-violet-700 transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                >
                   Refresh
                 </button>
               </div>
@@ -368,37 +410,52 @@ export default function DashboardPage() {
               ) : sessions.length === 0 ? (
                 <div className="p-4"><EmptyState title="No sessions yet" description="Visit and click around the demo page to create your first session." /></div>
               ) : (
-                <div className="max-h-[620px] space-y-1 overflow-y-auto p-2">
-                  {sortedSessions.map((session) => (
-                    <button
-                      key={session.sessionId}
-                      type="button"
-                      onClick={() => setSelectedSessionId(session.sessionId)}
-                      className={`flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left transition ${
-                        selectedSessionId === session.sessionId
-                          ? "bg-violet-600 text-white"
-                          : "text-slate-700 hover:bg-slate-100"
-                      }`}
-                    >
-                      <span className="min-w-0">
-                        <span className="block text-xs font-medium opacity-70">Session ID</span>
-                        <span className="block truncate font-mono text-sm" title={session.sessionId}>{shortSessionId(session.sessionId)}</span>
-                      </span>
-                      <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${selectedSessionId === session.sessionId ? "bg-white/15" : "bg-slate-200 text-slate-700"}`}>
-                        {session.eventCount}
-                      </span>
-                    </button>
-                  ))}
+                <div className="max-h-[640px] space-y-2 overflow-y-auto p-2">
+                  {sortedSessions.map((session) => {
+                    const isSelected = selectedSessionId === session.sessionId;
+                    const latestTimestamp = sessionTimestamps.get(session.sessionId);
+                    return (
+                      <button
+                        key={session.sessionId}
+                        type="button"
+                        onClick={() => setSelectedSessionId(session.sessionId)}
+                        className={`flex w-full items-start justify-between gap-3 rounded-2xl border px-4 py-3.5 text-left transition focus:outline-none focus:ring-2 focus:ring-violet-500/40 ${
+                          isSelected
+                            ? "border-violet-200 bg-violet-50 shadow-[0_12px_35px_-20px_rgba(124,58,237,0.6)]"
+                            : "border-transparent bg-white text-slate-700 hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
+                        }`}
+                      >
+                        <span className="min-w-0">
+                          <span className={`block text-[11px] font-semibold uppercase tracking-[0.24em] ${isSelected ? "text-violet-700" : "text-slate-400"}`}>
+                            Session ID
+                          </span>
+                          <span className="mt-1 block truncate font-mono text-sm text-slate-900" title={session.sessionId}>{shortSessionId(session.sessionId)}</span>
+                          <span className={`mt-2 block text-xs ${isSelected ? "text-violet-700/80" : "text-slate-500"}`}>
+                            {latestTimestamp ? formatTimestamp(latestTimestamp) : "No timestamp yet"}
+                          </span>
+                        </span>
+                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${isSelected ? "bg-white text-violet-700 shadow-sm" : "bg-slate-100 text-slate-700"}`}>
+                          {session.eventCount} events
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </aside>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-              <div className="border-b border-slate-200 pb-5">
-                <p className="text-xs font-bold uppercase tracking-widest text-violet-600">Ordered timeline</p>
-                <h2 className="mt-2 break-all font-mono text-lg font-bold text-slate-950">
-                  {selectedSessionId || "Select a session"}
-                </h2>
+            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.45)] sm:p-6">
+              <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-violet-600">Ordered timeline</p>
+                  <h2 className="mt-1 break-all font-mono text-lg font-semibold text-slate-950">
+                    {selectedSessionId || "Select a session"}
+                  </h2>
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-500">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                  {events.length} event{events.length === 1 ? "" : "s"}
+                </div>
               </div>
 
               <div className="mt-6">
@@ -411,45 +468,51 @@ export default function DashboardPage() {
                 ) : events.length === 0 ? (
                   <EmptyState title="No events found" description="This session does not have any stored events." />
                 ) : (
-                  <ol className="relative ml-3 border-l border-slate-200">
-                    {events.map((event, index) => (
-                      <li key={event._id} className="relative pb-8 pl-8 last:pb-0">
-                        <span className={`absolute -left-3 grid h-6 w-6 place-items-center rounded-full text-[10px] font-black text-white ring-4 ring-white ${event.eventType === "click" ? "bg-violet-600" : "bg-sky-500"}`}>
-                          {index + 1}
-                        </span>
-                        <div className="rounded-xl border border-slate-200 p-4 transition hover:border-violet-200 hover:shadow-sm">
-                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                            <span className={`w-fit rounded-full px-2.5 py-1 text-xs font-bold ${event.eventType === "click" ? "bg-violet-100 text-violet-700" : "bg-sky-100 text-sky-700"}`}>
-                              {event.eventType}
-                            </span>
-                            <time className="text-xs font-medium text-slate-500" dateTime={event.timestamp}>{formatTimestamp(event.timestamp)}</time>
+                  <div className="max-h-[660px] overflow-y-auto pl-2 pr-2">
+                    <ol className="relative ml-2 border-l border-slate-200">
+                      {events.map((event, index) => (
+                        <li key={event._id} className="relative pb-4 pl-7 last:pb-0">
+                          <span className={`absolute -left-3 top-2 grid h-6 w-6 place-items-center rounded-full text-[10px] font-black text-white ring-4 ring-white ${event.eventType === "click" ? "bg-violet-600" : "bg-sky-500"}`}>
+                            {index + 1}
+                          </span>
+                          <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-[0_10px_25px_-20px_rgba(15,23,42,0.4)] transition hover:border-violet-200 hover:bg-white hover:shadow-[0_16px_35px_-20px_rgba(124,58,237,0.35)]">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                              <span className={`w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${event.eventType === "click" ? "bg-violet-100 text-violet-700" : "bg-sky-100 text-sky-700"}`}>
+                                {event.eventType === "click" ? "Click" : "Page View"}
+                              </span>
+                              <time className="text-xs font-medium text-slate-500" dateTime={event.timestamp}>{formatTimestamp(event.timestamp)}</time>
+                            </div>
+                            <p className="mt-3 break-all text-sm font-medium text-slate-800">{event.pageUrl}</p>
+                            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                              {typeof event.x === "number" && typeof event.y === "number" ? (
+                                <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 font-mono">x: {event.x} · y: {event.y}</span>
+                              ) : (
+                                <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1">No coordinates recorded</span>
+                              )}
+                            </div>
                           </div>
-                          <p className="mt-3 break-all text-sm font-medium text-slate-800">{event.pageUrl}</p>
-                          {typeof event.x === "number" && typeof event.y === "number" && (
-                            <p className="mt-2 font-mono text-xs text-slate-500">x: {event.x} · y: {event.y}</p>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
                 )}
               </div>
             </div>
           </section>
         ) : (
-          <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+          <section className="mt-6 rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.45)] sm:p-6">
             <div className="flex flex-col gap-5 border-b border-slate-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-violet-600">Click visualization</p>
-                <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-950">Page heatmap</h2>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-violet-600">Click visualization</p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">Page heatmap</h2>
                 <p className="mt-1 text-sm text-slate-500">Dots show stored click coordinates on a 900 × 520 preview plane.</p>
               </div>
               <label className="block w-full max-w-xl">
-                <span className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">Page URL</span>
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Page URL</span>
                 <select
                   value={selectedPageUrl}
                   onChange={(event) => setSelectedPageUrl(event.target.value)}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-violet-500 focus:bg-white focus:ring-4 focus:ring-violet-100"
                 >
                   {pageUrls.length === 0 && <option value="">No page URLs discovered</option>}
                   {pageUrls.map((pageUrl) => <option key={pageUrl} value={pageUrl}>{pageUrl}</option>)}
@@ -468,17 +531,25 @@ export default function DashboardPage() {
                 <EmptyState title="No clicks on this page" description="Click around this page, then switch views or select the URL again to refresh its heatmap." />
               ) : (
                 <>
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs font-medium text-slate-500">
-                    <span>{clicks.length} click{clicks.length === 1 ? "" : "s"} recorded</span>
-                    <span>
-                      Normalized from {Math.ceil(normalizedHeatmap.sourceWidth)} × {Math.ceil(normalizedHeatmap.sourceHeight)}
-                    </span>
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-xs font-medium text-slate-500">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="inline-flex items-center gap-2 rounded-full bg-white px-2.5 py-1 shadow-sm">
+                        <span className="h-2 w-2 rounded-full bg-rose-500" />
+                        {clicks.length} click{clicks.length === 1 ? "" : "s"} recorded
+                      </span>
+                      <span className="rounded-full bg-white px-2.5 py-1 shadow-sm">
+                        Normalized from {Math.ceil(normalizedHeatmap.sourceWidth)} × {Math.ceil(normalizedHeatmap.sourceHeight)}
+                      </span>
+                    </div>
+                    <div className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+                      Preview plane
+                    </div>
                   </div>
-                  <div className="overflow-auto rounded-2xl border border-slate-300 bg-slate-100 p-3">
+                  <div className="overflow-auto rounded-2xl border border-slate-300 bg-slate-100 p-3 shadow-inner">
                     <div
                       ref={heatmapContainerRef}
-                      className="relative overflow-hidden rounded-xl bg-white shadow-inner"
-                      style={{ width: '100%', aspectRatio: `${PREVIEW_WIDTH} / ${PREVIEW_HEIGHT}` }}
+                      className="relative overflow-hidden rounded-xl bg-white shadow-[0_16px_45px_-24px_rgba(15,23,42,0.45)]"
+                      style={{ width: "100%", aspectRatio: `${PREVIEW_WIDTH} / ${PREVIEW_HEIGHT}` }}
                       aria-label={`Heatmap showing ${normalizedHeatmap.points.length} normalized clicks`}
                     >
                       <div className="absolute inset-x-0 top-0 h-16 border-b border-slate-200 bg-slate-50" />

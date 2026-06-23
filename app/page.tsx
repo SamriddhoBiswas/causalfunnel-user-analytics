@@ -2,104 +2,255 @@ const features = [
   {
     title: "Instant event capture",
     description: "Page views and clicks are collected automatically as visitors explore the page.",
-    accent: "bg-violet-100 text-violet-700"
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M5 12h14" strokeLinecap="round" />
+        <path d="M12 5v14" strokeLinecap="round" />
+      </svg>
+    )
   },
   {
     title: "Session-based insights",
     description: "A persistent browser session ID connects individual actions into a useful journey.",
-    accent: "bg-sky-100 text-sky-700"
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M6 7h12" strokeLinecap="round" />
+        <path d="M8 12h8" strokeLinecap="round" />
+        <path d="M10 17h4" strokeLinecap="round" />
+      </svg>
+    )
   },
   {
     title: "Heatmap-ready data",
     description: "Click coordinates reveal which parts of your experience attract the most attention.",
-    accent: "bg-amber-100 text-amber-700"
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M8 4v16" strokeLinecap="round" />
+        <path d="M16 4v16" strokeLinecap="round" />
+        <path d="M4 8h16" strokeLinecap="round" />
+        <path d="M4 16h16" strokeLinecap="round" />
+      </svg>
+    )
+  }
+];
+
+const trackedItems = [
+  {
+    label: "Page Views",
+    description: "Track page navigation and visitor flow through your application."
+  },
+  {
+    label: "Click Events",
+    description: "Capture every button press and element interaction with coordinates."
+  },
+  {
+    label: "Session Journeys",
+    description: "Group events by visitor session for complete user behavior understanding."
+  },
+  {
+    label: "Heatmaps",
+    description: "Visualize click patterns and interaction density across your pages."
   }
 ];
 
 export default function Home() {
   return (
-    <main className="min-h-screen overflow-hidden">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <a href="#top" className="flex items-center gap-3 font-semibold text-slate-950">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-violet-600 text-white">CF</span>
-          CausalFunnel
-        </a>
-        <div className="flex items-center gap-3 sm:gap-6">
-          <a href="#features" className="hidden text-sm font-medium text-slate-600 hover:text-violet-700 sm:block">
-            Features
+    <main className="min-h-screen bg-[#f8fafc] text-slate-900">
+      <nav className="border-b border-slate-200 bg-white/80 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 sm:px-8">
+          <a href="#top" className="text-base font-semibold tracking-tight text-slate-950">
+            User Analytics Dashboard
           </a>
-          <a href="#playground" className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold hover:border-violet-400 hover:text-violet-700">
-            Try the demo
-          </a>
+          <div className="flex items-center gap-3 sm:gap-6">
+            <a href="#features" className="hidden text-sm font-medium text-slate-600 hover:text-slate-950 sm:inline-flex">
+              Features
+            </a>
+            <a
+              href="#playground"
+              className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-950 shadow-sm hover:border-slate-400 hover:bg-slate-50"
+            >
+              Try the demo
+            </a>
+          </div>
         </div>
       </nav>
 
-      <section id="top" className="relative mx-auto max-w-6xl px-6 pb-24 pt-16 text-center sm:pt-24">
-        <div className="absolute left-1/2 top-12 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-200/60 blur-3xl" />
-        <span className="inline-flex rounded-full border border-violet-200 bg-white px-4 py-2 text-xs font-bold uppercase tracking-widest text-violet-700 shadow-sm">
-          User analytics, made tangible
-        </span>
-        <h1 className="mx-auto mt-7 max-w-4xl text-5xl font-black tracking-tight text-slate-950 sm:text-7xl">
-          Discover what your users actually do.
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-          This interactive page is a testing ground for CausalFunnel. Every click helps demonstrate how real behavior becomes useful product insight.
-        </p>
-        <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
-          <a href="#playground" className="rounded-full bg-violet-600 px-7 py-3.5 font-semibold text-white shadow-lg shadow-violet-200 transition hover:-translate-y-0.5 hover:bg-violet-700">
-            Start clicking
-          </a>
-          <a href="#features" className="rounded-full bg-white px-7 py-3.5 font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:ring-violet-300">
-            See how it works
-          </a>
+      <section id="top" className="border-b border-slate-200 bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.14),_transparent_38%),linear-gradient(180deg,_#ffffff_0%,_#f8fafc_100%)]">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-8 sm:py-16">
+          <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div className="max-w-2xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Analytics platform</p>
+              <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+                Understand how users move, click, and convert.
+              </h1>
+              <p className="mt-5 text-base leading-8 text-slate-600 sm:text-lg">
+                Capture page views, track clicks, understand sessions, and generate heatmaps in one polished analytics experience built for product teams.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href="#playground"
+                  className="inline-flex items-center justify-center rounded-lg bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"
+                >
+                  Try the demo
+                </a>
+                <a
+                  href="#features"
+                  className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm hover:border-slate-400 hover:bg-slate-50"
+                >
+                  Learn more
+                </a>
+              </div>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <div className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm">
+                  Page views
+                </div>
+                <div className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm">
+                  Click events
+                </div>
+                <div className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm">
+                  Session-aware
+                </div>
+                <div className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm">
+                  Heatmap-ready
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[24px] border border-slate-200 bg-slate-950 p-5 text-white shadow-[0_24px_60px_-24px_rgba(15,23,42,0.35)]">
+              <div className="rounded-[18px] border border-white/10 bg-white/5 p-4">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div>
+                    <p className="text-sm font-semibold">Analytics overview</p>
+                    <p className="mt-1 text-xs uppercase tracking-[0.24em] text-slate-400">Live demo</p>
+                  </div>
+                  <span className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1 text-[11px] font-medium text-slate-200">
+                    Active
+                  </span>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-white/10 bg-white/10 p-3">
+                    <p className="text-[11px] uppercase tracking-[0.24em] text-slate-400">Sessions</p>
+                    <p className="mt-2 text-2xl font-semibold">24</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/10 p-3">
+                    <p className="text-[11px] uppercase tracking-[0.24em] text-slate-400">Events</p>
+                    <p className="mt-2 text-2xl font-semibold">128</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 rounded-xl border border-white/10 bg-slate-900/70 p-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">Recent activity</p>
+                    <p className="text-xs text-slate-400">Updated now</p>
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                      <span className="text-sm text-slate-200">Homepage click</span>
+                      <span className="text-xs text-slate-400">2m ago</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                      <span className="text-sm text-slate-200">Session started</span>
+                      <span className="text-xs text-slate-400">5m ago</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                      <span className="text-sm text-slate-200">Heatmap point</span>
+                      <span className="text-xs text-slate-400">7m ago</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section id="features" className="border-y border-slate-200 bg-white py-24">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="max-w-2xl">
-            <p className="text-sm font-bold uppercase tracking-widest text-violet-600">Built for exploration</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Small interactions, meaningful signals.</h2>
+      <section id="features" className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-8">
+          <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Core capabilities</p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+                Everything needed for modern product analytics.
+              </h2>
+            </div>
           </div>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+
+          <div className="grid gap-6 md:grid-cols-3">
             {features.map((feature, index) => (
-              <article key={feature.title} className="group rounded-3xl border border-slate-200 p-7 shadow-sm transition hover:-translate-y-1 hover:border-violet-200 hover:shadow-xl">
-                <span className={`inline-grid h-11 w-11 place-items-center rounded-2xl font-bold ${feature.accent}`}>
-                  {index + 1}
-                </span>
-                <h3 className="mt-6 text-xl font-bold">{feature.title}</h3>
-                <p className="mt-3 leading-7 text-slate-600">{feature.description}</p>
-                <button type="button" className="mt-6 text-sm font-bold text-violet-700 group-hover:underline">
-                  Explore feature →
-                </button>
+              <article
+                key={feature.title}
+                className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm"
+              >
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white text-slate-950 shadow-sm">
+                  {feature.icon}
+                </div>
+                <h3 className="mt-4 text-lg font-semibold text-slate-950">{feature.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{feature.description}</p>
+                <div className="mt-5 text-sm font-semibold text-slate-700">0{index + 1}</div>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="playground" className="mx-auto max-w-6xl px-6 py-24">
-        <div className="rounded-[2rem] bg-slate-950 px-6 py-14 text-center text-white sm:px-12">
-          <p className="text-sm font-bold uppercase tracking-widest text-violet-300">Interaction playground</p>
-          <h2 className="mt-3 text-3xl font-bold sm:text-4xl">Give the tracker something to see.</h2>
-          <p className="mx-auto mt-4 max-w-xl leading-7 text-slate-300">
-            Click a few actions below. Each one creates a coordinate-aware event tied to your current session.
-          </p>
-          <div className="mt-9 flex flex-wrap justify-center gap-3">
-            <button type="button" className="rounded-xl bg-violet-500 px-5 py-3 font-semibold hover:bg-violet-400">Primary action</button>
-            <button type="button" className="rounded-xl bg-sky-500 px-5 py-3 font-semibold hover:bg-sky-400">Secondary action</button>
-            <button type="button" className="rounded-xl bg-amber-400 px-5 py-3 font-semibold text-slate-950 hover:bg-amber-300">Bright idea</button>
-            <button type="button" className="rounded-xl border border-slate-600 px-5 py-3 font-semibold hover:border-white">Quiet action</button>
+      <section className="border-b border-slate-200 bg-[#f8fafc]">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-8">
+          <div className="mb-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">What is being tracked</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+              Comprehensive behavior insights.
+            </h2>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2">
+            {trackedItems.map((item) => (
+              <div key={item.label} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-slate-950">{item.label}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{item.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-slate-200 bg-white py-8">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-sm text-slate-500 sm:flex-row">
-          <p>© 2026 CausalFunnel. Analytics demo.</p>
-          <div className="flex gap-5">
-            <a href="#top" className="hover:text-violet-700">Back to top</a>
-            <a href="mailto:hello@example.com" className="hover:text-violet-700">Contact</a>
+      <section id="playground" className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-8">
+          <div className="rounded-[24px] bg-slate-950 px-6 py-12 text-white shadow-[0_24px_60px_-24px_rgba(15,23,42,0.45)] sm:px-10 sm:py-14">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Interactive demo</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Generate a real session right now.</h2>
+              <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
+                Click any button below to create a tracked event. Then open the analytics dashboard to see your session in real time.
+              </p>
+            </div>
+
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <button type="button" className="rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800">
+                Primary action
+              </button>
+              <button type="button" className="rounded-lg bg-sky-500 px-5 py-3 text-sm font-semibold text-white hover:bg-sky-400">
+                Secondary action
+              </button>
+              <button type="button" className="rounded-lg bg-amber-400 px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-amber-300">
+                Bright idea
+              </button>
+              <button type="button" className="rounded-lg border border-slate-700 px-5 py-3 text-sm font-semibold text-white hover:border-slate-500 hover:bg-slate-900/50">
+                Quiet action
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-slate-600 sm:flex-row sm:px-8">
+          <p>© 2026 User Analytics Dashboard. Demo experience.</p>
+          <div className="flex gap-6">
+            <a href="#top" className="hover:text-slate-950">Back to top</a>
+            <a href="mailto:hello@example.com" className="hover:text-slate-950">Contact</a>
           </div>
         </div>
       </footer>

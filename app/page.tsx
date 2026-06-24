@@ -66,10 +66,10 @@ export default function Home() {
               Features
             </a>
             <a
-              href="#playground"
+              href="/dashboard"
               className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-950 shadow-sm hover:border-slate-400 hover:bg-slate-50"
             >
-              Try the demo
+              Go to Dashboard
             </a>
           </div>
         </div>
